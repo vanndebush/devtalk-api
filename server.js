@@ -6,7 +6,7 @@ const PORT = process.env.PORT || 3000;
 app.get('/', (req, res) => {
   res.json({
     status: 'success',
-    message: 'Hello World!'
+    message: 'DevTalk API v1.0 is Live!'
   });
 });
 
