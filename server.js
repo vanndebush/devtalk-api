@@ -1,5 +1,6 @@
 const express = require('express');
 const app = express();
+app.use(express.json());
 
 const PORT = process.env.PORT || 3000;
 
@@ -29,6 +30,22 @@ app.get('/api/posts', (req, res) => {
     status: 'success',
     totalData: posts.length,
     data: posts
+  });
+});
+app.post('/api/posts', (req, res) => {
+  const newPost = {
+    id: posts.length + 1,
+    author: req.body.author,
+    content: req.body.content,
+    createdAt: new Date().toISOString()
+  };
+
+  posts.push(newPost);
+
+  res.status(201).json({
+    status: 'success',
+    message: 'Post created!',
+    data: newPost
   });
 });
 
