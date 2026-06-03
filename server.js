@@ -44,8 +44,26 @@ app.post('/api/posts', (req, res) => {
 
   res.status(201).json({
     status: 'success',
-    message: 'Post created!',
+    message: 'Post created',
     data: newPost
+  });
+});
+app.delete('/api/posts/:id', (req, res) => {
+  const postId = parseInt(req.params.id);
+  const postIndex = posts.findIndex(post => post.id === postId);
+
+  if (postIndex === -1) {
+    return res.status(404).json({
+      status: 'fail',
+      message: `Post not found`
+    });
+  }
+
+  posts.splice(postIndex, 1);
+
+  res.json({
+    status: 'success',
+    message: 'Post deleted'
   });
 });
 
