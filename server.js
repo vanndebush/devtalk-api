@@ -34,7 +34,7 @@ app.get('/api/posts', (req, res) => {
 });
 app.post('/api/posts', (req, res) => {
   const newPost = {
-    id: posts.length + 1,
+    id: Date.now(),
     author: req.body.author,
     content: req.body.content,
     createdAt: new Date().toISOString()
@@ -44,7 +44,7 @@ app.post('/api/posts', (req, res) => {
 
   res.status(201).json({
     status: 'success',
-    message: 'Post created',
+    message: 'Post created successfully.',
     data: newPost
   });
 });
@@ -55,7 +55,7 @@ app.delete('/api/posts/:id', (req, res) => {
   if (postIndex === -1) {
     return res.status(404).json({
       status: 'fail',
-      message: `Post not found`
+      message: `Post with ID ${postId} not found.`
     });
   }
 
@@ -63,7 +63,7 @@ app.delete('/api/posts/:id', (req, res) => {
 
   res.json({
     status: 'success',
-    message: 'Post deleted'
+    message: 'Post deleted successfully.'
   });
 });
 
