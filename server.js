@@ -66,6 +66,33 @@ app.delete('/api/posts/:id', (req, res) => {
     message: 'Post deleted successfully.'
   });
 });
+app.put('/api/posts/:id', (req, res) => {
+  const postId = parseInt(req.params.id);
+  const postIndex = posts.findIndex(post => post.id === postId);
+
+  if (postIndex === -1) {
+    return res.status(404).json({
+      status: 'fail',
+      message: `Post with ID ${postId} not found.`
+    });
+  }
+
+  const oldPost = posts[postIndex];
+  const updatedPost = {
+    id: oldPost.id,
+    author: oldPost.author,
+    content: req.body.content || oldPost.content,
+    createdAt: oldPost.createdAt
+  }
+
+  posts[postIndex] = updatedPost;
+
+  res.json({
+    status: 'success',
+    message: 'Post updated successfully.',
+    data: updatedPost
+  });
+});
 
 app.listen(PORT, () => {
   console.log(`DevTalk server is running at http://localhost:${PORT}`);
