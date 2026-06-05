@@ -21,10 +21,19 @@ const getAllPosts = (req, res) => {
   });
 };
 const createPost = (req, res) => {
+  const { author, content } = req.body;
+
+  if (!author || !content) {
+    return res.status(400).json({
+      status: 'fail',
+      message: 'Author and content must be filled!'
+    });
+  }
+
   const newPost = {
     id: Date.now(),
-    author: req.body.author,
-    content: req.body.content,
+    author,
+    content,
     createdAt: new Date().toISOString()
   };
 
@@ -47,11 +56,18 @@ const updatePost = (req, res) => {
     });
   }
 
+  if (!req.body.content) {
+    return res.status(400).json({
+      status: 'fail',
+      message: 'Content must be filled!'
+    });
+  }
+
   const oldPost = posts[postIndex];
   const updatedPost = {
     id: oldPost.id,
     author: oldPost.author,
-    content: req.body.content || oldPost.content,
+    content: req.body.content,
     createdAt: oldPost.createdAt
   }
 
