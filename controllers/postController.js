@@ -45,6 +45,22 @@ const createPost = (req, res) => {
     data: newPost
   });
 };
+const getPostById = (req, res) => {
+  const postId = parseInt(req.params.id);
+  const post = posts.find(post => post.id === postId);
+
+  if (!post) {
+    return res.status(404).json({
+      status: 'fail',
+      message: `Post with ID ${postId} not found.`
+    });
+  }
+
+  res.json({
+    status: 'success',
+    data: post
+  });
+};
 const updatePost = (req, res) => {
   const postId = parseInt(req.params.id);
   const postIndex = posts.findIndex(post => post.id === postId);
@@ -98,4 +114,4 @@ const deletePost = (req, res) => {
   });
 };
 
-module.exports = { getAllPosts, createPost, updatePost, deletePost };
+module.exports = { getAllPosts, createPost, getPostById, updatePost, deletePost };
