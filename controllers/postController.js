@@ -14,10 +14,15 @@ let posts = [
 ];
 
 const getAllPosts = (req, res) => {
+  const { author } = req.query;
+  let resultPosts = posts;
+
+  if (author) resultPosts = resultPosts.filter(post => post.author.toLowerCase() === author.toLowerCase());
+
   res.json({
     status: 'success',
-    totalData: posts.length,
-    data: posts
+    totalData: resultPosts.length,
+    data: resultPosts
   });
 };
 const createPost = (req, res) => {
