@@ -14,15 +14,29 @@ let posts = [
 ];
 
 const getAllPosts = (req, res) => {
-  const { author } = req.query;
+  const { author, page = 1, limit = 5 } = req.query;
   let resultPosts = posts;
 
   if (author) resultPosts = resultPosts.filter(post => post.author.toLowerCase() === author.toLowerCase());
 
+  const pageNumber = parseInt(page);
+  const limitNumber = parseInt(limit);
+
+  const startIndex = (pageNumber - 1) * limitNumber;
+  const endIndex = pageNumber * limitNumber;
+
+  const paginatedPosts = resultPosts.slice(startIndex, endIndex);
+  const totalPages = Math.ceil(resultPosts.length / limitNumber);
+
   res.json({
     status: 'success',
-    totalData: resultPosts.length,
-    data: resultPosts
+    meta: {
+      totalData: resultPosts.length,
+      totalPages,
+      currentPages: pageNumber,
+      limit: limitNumber
+    },
+    data: paginatedPosts
   });
 };
 const createPost = (req, res) => {
