@@ -1,17 +1,6 @@
-let posts = [
-  {
-    id: 1,
-    author: 'vanndebush',
-    content: 'Lorem ipsum dolor sit amet consectetur adipisicing elit.',
-    createdAt: new Date().toISOString()
-  },
-  {
-    id: 2,
-    author: 'loverrukk',
-    content: 'Lorem ipsum! Dolor sit amet, consectetur adipisicing elit :(',
-    createdAt: new Date().toISOString()
-  }
-];
+const Post = require('./../models/postModel');
+
+let posts = [];
 
 const getAllPosts = (req, res) => {
   const { author, page = 1, limit = 5 } = req.query;
@@ -39,30 +28,22 @@ const getAllPosts = (req, res) => {
     data: paginatedPosts
   });
 };
-const createPost = (req, res) => {
-  const { author, content } = req.body;
+const createPost = async (req, res) => {
+  try {
+    const { author, content } = req.body;
 
-  if (!author || !content) {
-    return res.status(400).json({
+    const newPost = await Post.create({ author, content });
+
+    res.status(201).json({
+      status: 'success',
+      data: newPost
+    });
+  } catch (error) {
+    res.status(404).json({
       status: 'fail',
-      message: 'Author and content must be filled!'
+      message: error.message
     });
   }
-
-  const newPost = {
-    id: Date.now(),
-    author,
-    content,
-    createdAt: new Date().toISOString()
-  };
-
-  posts.push(newPost);
-
-  res.status(201).json({
-    status: 'success',
-    message: 'Post created successfully.',
-    data: newPost
-  });
 };
 const getPostById = (req, res) => {
   const postId = parseInt(req.params.id);
