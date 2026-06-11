@@ -2,31 +2,37 @@ const Post = require('./../models/postModel');
 
 let posts = [];
 
-const getAllPosts = (req, res) => {
-  const { author, page = 1, limit = 5 } = req.query;
-  let resultPosts = posts;
+const getAllPosts = async (req, res) => {
+  try {
+    const { author, page = 1, limit = 5 } = req.query;
 
-  if (author) resultPosts = resultPosts.filter(post => post.author.toLowerCase() === author.toLowerCase());
+    let query = {};
+    if (author) query.author = { $regex: new regExp(author, 'i') };
 
-  const pageNumber = parseInt(page);
-  const limitNumber = parseInt(limit);
+    const pageNumber = parseInt(page);
+    const limitNumber = parseInt(limit);
+    const skip = (pageNumber - 1) * limitNumber;
 
-  const startIndex = (pageNumber - 1) * limitNumber;
-  const endIndex = pageNumber * limitNumber;
+    const resultPosts = await Post.find(query).skip(skip).limit(limitNumber);
+    const totalData = await Post.countDocuments(query);
+    const totalPages = Math.ceil(totalData / limitNumber);
 
-  const paginatedPosts = resultPosts.slice(startIndex, endIndex);
-  const totalPages = Math.ceil(resultPosts.length / limitNumber);
-
-  res.json({
-    status: 'success',
-    meta: {
-      totalData: resultPosts.length,
-      totalPages,
-      currentPages: pageNumber,
-      limit: limitNumber
-    },
-    data: paginatedPosts
-  });
+    res.json({
+      status: 'success',
+      meta: {
+        totalData,
+        totalPages,
+        currentPages: pageNumber,
+        limit: limitNumber
+      },
+      data: resultPosts
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 'fail',
+      message: error.message
+    });
+  }
 };
 const createPost = async (req, res) => {
   try {
