@@ -51,55 +51,56 @@ const createPost = async (req, res) => {
     });
   }
 };
-const getPostById = (req, res) => {
-  const postId = parseInt(req.params.id);
-  const post = posts.find(post => post.id === postId);
+const getPostById = async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
 
-  if (!post) {
-    return res.status(404).json({
+    if (!post) {
+      return res.status(404).json({
+        status: 'fail',
+        message: `Post with ID ${req.params.id} not found`
+      });
+    }
+
+    res.json({
+      status: 'success',
+      data: post
+    });
+  } catch (error) {
+    res.status(400).json({
       status: 'fail',
-      message: `Post with ID ${postId} not found.`
+      message: 'Invalid ID format'
     });
   }
-
-  res.json({
-    status: 'success',
-    data: post
-  });
 };
-const updatePost = (req, res) => {
-  const postId = parseInt(req.params.id);
-  const postIndex = posts.findIndex(post => post.id === postId);
+const updatePost = async (req, res) => {
+  try {
+    const updatedPost = await Post.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      {
+        returnDocument: 'after',
+        runValidators: true
+      }
+    );
 
-  if (postIndex === -1) {
-    return res.status(404).json({
+    if (!updatedPost) {
+      return res.status(404).json({
+        status: 'fail',
+        message: `Post with ID ${req.params.id} not found`
+      });
+    }
+
+    res.json({
+      status: 'success',
+      data: updatedPost
+    });
+  } catch (error) {
+    res.status(400).json({
       status: 'fail',
-      message: `Post with ID ${postId} not found.`
+      message: error.message
     });
   }
-
-  if (!req.body.content) {
-    return res.status(400).json({
-      status: 'fail',
-      message: 'Content must be filled!'
-    });
-  }
-
-  const oldPost = posts[postIndex];
-  const updatedPost = {
-    id: oldPost.id,
-    author: oldPost.author,
-    content: req.body.content,
-    createdAt: oldPost.createdAt
-  }
-
-  posts[postIndex] = updatedPost;
-
-  res.json({
-    status: 'success',
-    message: 'Post updated successfully.',
-    data: updatedPost
-  });
 };
 const deletePost = (req, res) => {
   const postId = parseInt(req.params.id);
