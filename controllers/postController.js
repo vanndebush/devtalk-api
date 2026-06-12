@@ -1,7 +1,5 @@
 const Post = require('./../models/postModel');
 
-let posts = [];
-
 const getAllPosts = async (req, res) => {
   try {
     const { author, page = 1, limit = 5 } = req.query;
@@ -17,7 +15,7 @@ const getAllPosts = async (req, res) => {
     const totalData = await Post.countDocuments(query);
     const totalPages = Math.ceil(totalData / limitNumber);
 
-    res.json({
+    res.status(200).json({
       status: 'success',
       meta: {
         totalData,
@@ -62,7 +60,7 @@ const getPostById = async (req, res) => {
       });
     }
 
-    res.json({
+    res.status(200).json({
       status: 'success',
       data: post
     });
@@ -91,7 +89,7 @@ const updatePost = async (req, res) => {
       });
     }
 
-    res.json({
+    res.status(200).json({
       status: 'success',
       data: updatedPost
     });
@@ -102,23 +100,27 @@ const updatePost = async (req, res) => {
     });
   }
 };
-const deletePost = (req, res) => {
-  const postId = parseInt(req.params.id);
-  const postIndex = posts.findIndex(post => post.id === postId);
+const deletePost = async (req, res) => {
+  try {
+    const deletedPost = await Post.findByIdAndDelete(req.params.id);
 
-  if (postIndex === -1) {
-    return res.status(404).json({
+    if (!deletedPost) {
+      return res.status(404).json({
+        status: 'fail',
+        message: `Post with ID ${req.params.id} not found`
+      });
+    }
+
+    res.status(200).json({
+      status: 'success',
+      message: 'Post successfully deleted'
+    });
+  } catch (error) {
+    res.status(400).json({
       status: 'fail',
-      message: `Post with ID ${postId} not found.`
+      message: 'Invalid ID format'
     });
   }
-
-  posts.splice(postIndex, 1);
-
-  res.json({
-    status: 'success',
-    message: 'Post deleted successfully.'
-  });
 };
 
 module.exports = { getAllPosts, createPost, getPostById, updatePost, deletePost };
